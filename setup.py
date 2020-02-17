@@ -1,4 +1,6 @@
 from setuptools import setup
+from os.path import join
+from glob import glob
 
 package_name = 'luos_bike_alarm_example'
 
@@ -7,8 +9,10 @@ setup(
     version='0.0.1',
     packages=[package_name],
     data_files=[
-        ('share/ament_index/resource_index/packages',
-            ['resource/' + package_name]),
+        ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
+        ('share/ament_index/resource_index/packages', ['resource/bike.rviz']),
+        ('share/ament_index/resource_index/packages', ['resource/bike.stl']),
+        (join('share', package_name), glob('launch/*.launch.py')),
         ('share/' + package_name, ['package.xml']),
     ],
     install_requires=['setuptools'],

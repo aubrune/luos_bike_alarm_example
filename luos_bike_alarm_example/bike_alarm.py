@@ -5,6 +5,9 @@ from rclpy.node import Node
 from sensor_msgs.msg import Imu
 from visualization_msgs.msg import Marker
 from rclpy.timer import Clock
+from os.path import join
+from ament_index_python.packages import get_package_prefix
+from ament_index_python.resources import RESOURCE_INDEX_SUBFOLDER
 
 class BikeExampleNode(Node):
     TOPIC_NAME_MARKERS = "/bike_alarm/markers"
@@ -22,9 +25,8 @@ class BikeExampleNode(Node):
         self.bike.type = Marker.MESH_RESOURCE
         #self.bike.header.stamp = self.clock.now()
         self.bike.header.frame_id = "/world"
-        # FIXME: from ament_index_python import get_resources
-        # TODO: How does this resource-thing now work?
-        self.bike.mesh_resource = "file:///home/yoan/ros2_ws/src/luos_bike_alarm_example/assets/bike.stl"
+        self.bike.mesh_resource = "file://" + join(get_package_prefix('luos_bike_alarm_example'),
+                                       RESOURCE_INDEX_SUBFOLDER, "packages", 'bike.stl')
         self.bike.scale.x = 1e-3
         self.bike.scale.y = 1e-3
         self.bike.scale.z = 1e-3
