@@ -11,7 +11,8 @@ from ament_index_python.resources import RESOURCE_INDEX_SUBFOLDER
 
 class BikeExampleNode(Node):
     TOPIC_NAME_MARKERS = "/bike_alarm/markers"
-    TOPIC_NAME_LUOS_IMU = "/gps/imu"
+    TOPIC_NAME_LUOS_IMU = "/Imu_mod/imu"
+    
     def __init__(self):
         super().__init__('bike_alarm')
         self.publisher_ = self.create_publisher(Marker, self.TOPIC_NAME_MARKERS, 10)
