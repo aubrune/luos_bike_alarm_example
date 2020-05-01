@@ -1,51 +1,101 @@
-
-
 import rclpy
 from rclpy.node import Node
+from time import time
 from sensor_msgs.msg import Imu
+from luos_msgs.msg import State
 from visualization_msgs.msg import Marker
-from rclpy.timer import Clock
 from os.path import join
 from ament_index_python.packages import get_package_prefix
 from ament_index_python.resources import RESOURCE_INDEX_SUBFOLDER
 
+
+class BikeColor:
+    # Represent the color of the bike marker in RViz according to its riding state
+    GREEN = [0.2, 1., 0.2]
+    RED = [1., 0.2, 0.2]
+    WHITE = [1., 1., 1.]
+    BLINK_FAST = 0.4
+    BLINK_SLOW = 1.
+    BLINK_NONE = float('inf')
+
+    def __init__(self):
+        self._color = self.GREEN
+        self._update_time = time()
+        self._on = True
+        self._blink = self.BLINK_NONE
+        
+    @property
+    def color(self):
+        now = time()
+        if self._blink == self.BLINK_NONE:
+            self._on = True
+        elif now - self._update_time > self._blink:
+            self._on = not self._on
+            self._update_time = now
+        return self._color if self._on else self.WHITE
+
+    def set_color(self, color="white", blink="none"):
+        self._color = getattr(self, color.upper())
+        self._blink = getattr(self, "BLINK_" + blink.upper())
+        self._update_time = 0
+
+
 class BikeExampleNode(Node):
+    # The actual node of the bike riding application
     TOPIC_NAME_MARKERS = "/bike_alarm/markers"
     TOPIC_NAME_LUOS_IMU = "/Imu_mod/imu"
+    TOPIC_NAME_LUOS_STATE = "/lock/events/changed"
     
     def __init__(self):
         super().__init__('bike_alarm')
         self.publisher_ = self.create_publisher(Marker, self.TOPIC_NAME_MARKERS, 10)
-        self.subscriber = self.create_subscription(Imu, self.TOPIC_NAME_LUOS_IMU, self._cb_imu_received, 10)
-        self.timer = self.create_timer(0.1, self._cb_publish_markers)
-        self.clock = Clock()
+        self.subscriber_imu = self.create_subscription(Imu, self.TOPIC_NAME_LUOS_IMU, self._cb_imu_received, 10)
+        self.subscriber_button = self.create_subscription(State, self.TOPIC_NAME_LUOS_STATE, self._cb_state_received, 10)
+        self.timer_bike = self.create_timer(0.1, self._cb_timer_bike)
+        self.bike_color = BikeColor()
+        self.state = "idle"   # The bike current state : ["idle", "ride", "alarm"]
 
         # Here is the bike to be published in RViz
         self.bike = Marker()
-        self.bike.text = "Luos bike"
         self.bike.type = Marker.MESH_RESOURCE
-        #self.bike.header.stamp = self.clock.now()
         self.bike.header.frame_id = "/world"
         self.bike.mesh_resource = "file://" + join(get_package_prefix('luos_bike_alarm_example'),
                                        RESOURCE_INDEX_SUBFOLDER, "packages", 'bike.stl')
         self.bike.scale.x = 1e-3
         self.bike.scale.y = 1e-3
         self.bike.scale.z = 1e-3
-        self.bike.color.r = 1.
-        self.bike.color.g = 1.
-        self.bike.color.b = 1.
         self.bike.color.a = 1.
         self.bike.pose.position.z = 3.
         self.bike.pose.orientation.w = 1.
 
-    def _cb_imu_received(self, imu):
-        # This callback is called when an Imu message is received on the specified topic 
-        self.bike.pose.orientation = imu.orientation
+        self.get_logger().info("This is the Luos bike sharing example. \
+Shake the IMU {} or press the State button {}".format(self.TOPIC_NAME_LUOS_IMU, self.TOPIC_NAME_LUOS_STATE))
 
-    def _cb_publish_markers(self):
+    def _cb_imu_received(self, msg):
+        # This callback is called when an Imu message is received on the specified topic 
+        self.bike.pose.orientation = msg.orientation
+        acc = msg.linear_acceleration
+        if abs(acc.x) + abs(acc.y) + abs(acc.z) > 20 and self.state == "idle":
+            self.get_logger().error("Alarm triggered!")
+            self.state = "alarm"
+            self.bike_color.set_color("red", "fast")
+
+    def _cb_state_received(self, msg):
+        # This callback is called when the state button is pressed
+        if not msg.old_value and msg.new_value:
+            if self.state in ["ride", "alarm"]:
+                self.get_logger().info("Bike is idle")
+                self.state = "idle"
+                self.bike_color.set_color("green", "none")
+            else:
+                self.get_logger().warn("Riding...")
+                self.state = "ride"
+                self.bike_color.set_color("green", "slow")
+
+    def _cb_timer_bike(self):
         # This publisher is called at a regular rate
+        self.bike.color.r, self.bike.color.g, self.bike.color.b = self.bike_color.color
         self.publisher_.publish(self.bike)
-        self.get_logger().info("Publishing bike")
 
 def main():
     rclpy.init()
