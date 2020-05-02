@@ -1,6 +1,5 @@
 import launch
 import launch.actions
-import launch.substitutions
 import launch_ros.actions
 from os.path import join
 from ament_index_python.packages import get_package_prefix
@@ -10,10 +9,6 @@ rviz_file = join(get_package_prefix('luos_bike_alarm_example'), RESOURCE_INDEX_S
 
 def generate_launch_description():
     return launch.LaunchDescription([
-        launch.actions.DeclareLaunchArgument(
-            'luos',
-            default_value=[launch.substitutions.EnvironmentVariable('USER'), '_'],
-            description='luos_bike_'),
         launch_ros.actions.Node(
             package='luos_interface', node_executable='broker', output='screen'),
         launch_ros.actions.Node(
