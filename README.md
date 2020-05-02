@@ -1,10 +1,17 @@
 # Luos ROS example: Bike sharing example
 
+This is a Luos example using ROS2, the bike sharing application:
 
-This is a Luos example using ROS2: the bike sharing setup works as is: TODO
+* The bike pops up in steady green when it's idle
+* Agitate the imu when it's idle, it's being stolen, the RGB alarm flashes in red
+* Press the state button to acknowledge the alarm
+* Press again to start riding, the bike slighly blinks in green
+* Press a new time to stop riding, it becomes idle again
 
-## Get started
-Make sure you first downloaded package `luos_interface` from `luos_ros2` repository and this example package and that you have compiled and sourced your ROS2 workspace:
+![Bike sharing example](./doc/img/rviz.png)
+
+## Get started in ROS2
+First, download packages and compile:
 ```
 ~/ros2_ws/src/$ git clone https://github.com/aubrune/luos_ros2.git
 ~/ros2_ws/src/$ git clone https://github.com/aubrune/luos_bike_alarm_example.git
@@ -13,7 +20,7 @@ Make sure you first downloaded package `luos_interface` from `luos_ros2` reposit
 ~/ros2_ws/$ source ~/.bashrc                  # Source all new launches messages and resources
 ```
 
-Plug at least a Luos Imu node and gate to your computer. The expected alias is `Imu_mod`.
+Plug at least a Luos Imu node and gate to your computer, as well as optional RGB and State modules. The expected Luos modules' aliases are the default, if they're not, update the [topic names](./luos_bike_alarm_example/bike_alarm.py#L12) with your custom aliases.
 
 Then, start the bike example from its launchfile:
 ```
