@@ -1,3 +1,5 @@
+[![](http://certified.luos.io)](https://luos.io)
+
 # Luos ROS example: Bike sharing example
 
 This is a Luos example using ROS2, the bike sharing application:
@@ -28,3 +30,6 @@ Then, start the bike example from its launchfile:
 ```
 
 RViz2 will pop up and show a bike, agitate the Luo Imu node in order to update the RViz2 view in real time. If the bike shows but does not actuate, make sure that Imu data comes from the expected topic `/Imu_mod/imu`, or change the topic name.
+
+[![](https://img.shields.io/discourse/topics?server=https%3A%2F%2Fcommunity.luos.io&logo=Discourse)](https://community.luos.io)
+[![](https://img.shields.io/badge/Luos-Documentation-34A3B4)](https://docs.luos.io)
