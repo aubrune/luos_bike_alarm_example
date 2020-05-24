@@ -13,9 +13,11 @@ This is a Luos example using ROS2, the bike sharing application:
 ![Bike sharing example](./doc/img/rviz.png)
 
 ## Get started in ROS2
-First, download packages and compile:
+
+This example ROS2 package relies on `luos_interface`, make sure you first installed it by following [its own procedure](https://github.com/aubrune/luos_ros2#install-ros-2-and-luos).
+
+Then, download the example package and compile it with `colcon`:
 ```
-~/ros2_ws/src/$ git clone https://github.com/aubrune/luos_ros2.git
 ~/ros2_ws/src/$ git clone https://github.com/aubrune/luos_bike_alarm_example.git
 
 ~/ros2_ws/$ colcon build --symlink-install    # Build the ROS workspace
