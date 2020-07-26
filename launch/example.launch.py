@@ -10,10 +10,10 @@ rviz_file = join(get_package_prefix('luos_bike_alarm_example'), RESOURCE_INDEX_S
 def generate_launch_description():
     return launch.LaunchDescription([
         launch_ros.actions.Node(
-            package='luos_interface', node_executable='broker', output='screen'),
+            package='luos_interface', executable='broker', output='screen'),
         launch_ros.actions.Node(
-            package='rviz2', node_executable='rviz2', output='screen',
+            package='rviz2', executable='rviz2', output='screen',
             arguments=['--display-config', rviz_file]),
         launch_ros.actions.Node(
-            package='luos_bike_alarm_example', node_executable='bike_alarm', output='screen')
+            package='luos_bike_alarm_example', executable='bike_alarm', output='screen')
     ])
