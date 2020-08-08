@@ -3,7 +3,7 @@ from rclpy.node import Node
 from time import time
 from std_msgs.msg import ColorRGBA
 from sensor_msgs.msg import Imu
-from luos_msgs.msg import State
+from luos_msgs.msg import BoolChange
 from visualization_msgs.msg import Marker
 from os.path import join
 from ament_index_python.packages import get_package_prefix
@@ -51,7 +51,7 @@ class BikeExampleNode(Node):
         super().__init__('bike_alarm')
         self.publisher_ = self.create_publisher(Marker, TOPIC_NAME_MARKERS, 10)
         self.subscriber_imu = self.create_subscription(Imu, TOPIC_NAME_LUOS_IMU, self._cb_imu_received, 10)
-        self.subscriber_button = self.create_subscription(State, TOPIC_NAME_LUOS_STATE, self._cb_state_received, 10)
+        self.subscriber_button = self.create_subscription(BoolChange, TOPIC_NAME_LUOS_STATE, self._cb_state_received, 10)
         self.timer_bike = self.create_timer(0.1, self._cb_timer_bike)
         self.bike_color = BikeColor()
         self.state = "idle"   # The bike current state : ["idle", "ride", "alarm"]
